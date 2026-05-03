@@ -1,12 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { IconSearch, IconCheck, IconX, IconTrash, IconLoader2, IconEye, IconAlertCircle } from "@tabler/icons-react";
+import { IconSearch, IconCheck, IconX, IconTrash, IconLoader2, IconEye, IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react";
 import { getAllRegistrations, updateRegistrationStatus, deleteRegistration } from "@/lib/data";
+
+// Custom Confirmation Modal
+function ConfirmModal({ open, title, message, onConfirm, onCancel, variant = "danger" }: {
+  open: boolean;
+  title: string;
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  variant?: "danger" | "success";
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onCancel}>
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-start space-x-4">
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${variant === "danger" ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"}`}>
+            <IconAlertTriangle size={24} />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-neutral-900">{title}</h3>
+            <p className="text-sm text-neutral-500 mt-1">{message}</p>
+          </div>
+        </div>
+        <div className="flex justify-end gap-3 pt-2">
+          <Button variant="ghost" onClick={onCancel} className="px-6">Batal</Button>
+          <Button
+            onClick={onConfirm}
+            className={`px-6 text-white ${variant === "danger" ? "bg-red-600 hover:bg-red-700" : "bg-emerald-600 hover:bg-emerald-700"}`}
+          >
+            Ya, Lanjutkan
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function PendaftarPage() {
   const [registrations, setRegistrations] = useState<Record<string, unknown>[]>([]);
@@ -20,27 +56,56 @@ export default function PendaftarPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState("");
 
-  const loadData = async () => {
+  // Confirmation modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    variant: "danger" | "success";
+    action: (() => Promise<void>) | null;
+  }>({ open: false, title: "", message: "", variant: "danger", action: null });
+
+  const loadData = useCallback(async () => {
     const data = await getAllRegistrations();
     setRegistrations(data || []);
     setLoading(false);
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const showConfirm = (title: string, message: string, action: () => Promise<void>, variant: "danger" | "success" = "danger") => {
+    setConfirmModal({ open: true, title, message, variant, action });
   };
 
-  useEffect(() => { loadData(); }, []);
-
-  const handleApprove = async (id: string) => {
-    if (!confirm("Yakin ingin menerima pendaftaran ini?")) return;
-    setActionLoading(id);
-    setActionError("");
-    try {
-      await updateRegistrationStatus(id, "Diterima");
-      await loadData();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Gagal mengubah status.";
-      setActionError(msg);
-    } finally {
-      setActionLoading(null);
+  const executeConfirm = async () => {
+    if (confirmModal.action) {
+      await confirmModal.action();
     }
+    setConfirmModal({ open: false, title: "", message: "", variant: "danger", action: null });
+  };
+
+  const cancelConfirm = () => {
+    setConfirmModal({ open: false, title: "", message: "", variant: "danger", action: null });
+  };
+
+  const handleApprove = (id: string) => {
+    showConfirm(
+      "Terima Pendaftaran",
+      "Yakin ingin menerima pendaftaran ini? Status akan diubah menjadi 'Diterima'.",
+      async () => {
+        setActionLoading(id);
+        setActionError("");
+        try {
+          await updateRegistrationStatus(id, "Diterima");
+          await loadData();
+        } catch (err: unknown) {
+          setActionError(err instanceof Error ? err.message : "Gagal mengubah status.");
+        } finally {
+          setActionLoading(null);
+        }
+      },
+      "success"
+    );
   };
 
   const handleReject = async (id: string) => {
@@ -53,26 +118,29 @@ export default function PendaftarPage() {
       setRejectReason("");
       await loadData();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Gagal menolak pendaftaran.";
-      setActionError(msg);
+      setActionError(err instanceof Error ? err.message : "Gagal menolak pendaftaran.");
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Yakin ingin menghapus data ini? Tindakan ini tidak bisa dibatalkan.")) return;
-    setActionLoading(id);
-    setActionError("");
-    try {
-      await deleteRegistration(id);
-      await loadData();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Gagal menghapus data.";
-      setActionError(msg);
-    } finally {
-      setActionLoading(null);
-    }
+  const handleDelete = (id: string) => {
+    showConfirm(
+      "Hapus Data Pendaftar",
+      "Yakin ingin menghapus data ini? Tindakan ini tidak bisa dibatalkan dan data akan hilang permanen.",
+      async () => {
+        setActionLoading(id);
+        setActionError("");
+        try {
+          await deleteRegistration(id);
+          await loadData();
+        } catch (err: unknown) {
+          setActionError(err instanceof Error ? err.message : "Gagal menghapus data.");
+        } finally {
+          setActionLoading(null);
+        }
+      }
+    );
   };
 
   const statusBadge = (s: string) => {
@@ -97,12 +165,21 @@ export default function PendaftarPage() {
 
   return (
     <div className="space-y-8">
+      {/* Custom Confirm Modal */}
+      <ConfirmModal
+        open={confirmModal.open}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        onConfirm={executeConfirm}
+        onCancel={cancelConfirm}
+      />
+
       <div>
         <h1 className="text-3xl font-heading font-bold text-neutral-900">Data Pendaftar</h1>
         <p className="text-neutral-500 mt-2">Kelola dan verifikasi data calon peserta didik baru. Total: <strong>{registrations.length}</strong></p>
       </div>
 
-      {/* Error Alert */}
       {actionError && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-3 text-red-800">
           <IconAlertCircle size={20} className="shrink-0 mt-0.5" />
@@ -162,7 +239,6 @@ export default function PendaftarPage() {
                         <td className="py-4 px-4">
                           <div>
                             <p className="text-sm font-semibold text-neutral-900">{reg.student_name as string || "-"}</p>
-                            {/* Expandable detail inline */}
                             {expandedId === id && (
                               <div className="mt-3 p-3 bg-blue-50 rounded-lg grid grid-cols-2 gap-2 text-xs">
                                 <div><span className="text-neutral-400">Gender:</span> <strong>{reg.gender as string || "-"}</strong></div>
@@ -174,7 +250,6 @@ export default function PendaftarPage() {
                                 <div className="col-span-2"><span className="text-neutral-400">Alamat:</span> <strong>{reg.address as string || "-"}, {reg.district as string || "-"}</strong></div>
                               </div>
                             )}
-                            {/* Reject reason input inline */}
                             {rejectingId === id && (
                               <div className="mt-3 p-3 bg-red-50 rounded-lg flex gap-2 items-center">
                                 <Input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Tulis alasan penolakan..." className="flex-1 bg-white text-sm h-9" />
