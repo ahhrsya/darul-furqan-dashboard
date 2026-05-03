@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { IconCheck, IconClock, IconAlertCircle, IconChevronLeft, IconLoader2, IconCircleCheckFilled } from "@tabler/icons-react";
+import { IconCheck, IconClock, IconAlertCircle, IconChevronLeft, IconLoader2 } from "@tabler/icons-react";
 import { supabase } from "@/lib/supabase";
 import { getRegistrations } from "@/lib/data";
 

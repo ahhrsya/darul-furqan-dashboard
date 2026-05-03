@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,11 +10,7 @@ import { IconChevronRight, IconChevronLeft, IconCheck, IconLoader2, IconAlertCir
 import { supabase } from "@/lib/supabase";
 import { createRegistration, getRegistrations } from "@/lib/data";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 export default function FormulirPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const jenjang = searchParams.get("jenjang") || "SMA";
   

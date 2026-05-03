@@ -1,20 +1,50 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconLayoutDashboard, IconSchool, IconClock, IconFileText, IconNews } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
+import { getRegistrations } from "@/lib/data";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [hasRegistration, setHasRegistration] = useState(false);
+  const [userName, setUserName] = useState("Siswa");
 
+  useEffect(() => {
+    async function checkStatus() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserName(user.email?.split("@")[0] || "Siswa");
+        const regs = await getRegistrations(user.id);
+        if (regs && regs.length > 0) {
+          setHasRegistration(true);
+        }
+      }
+    }
+    checkStatus();
+  }, []);
+
+  // Base nav items always visible
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: IconLayoutDashboard },
-    { name: "Pilih Jenjang", href: "/dashboard/ppdb/pilih-jenjang", icon: IconSchool },
-    { name: "Formulir", href: "/dashboard/ppdb/formulir", icon: IconFileText },
+  ];
+
+  // Only show registration menu if user hasn't registered yet
+  if (!hasRegistration) {
+    navItems.push(
+      { name: "Pilih Jenjang", href: "/dashboard/ppdb/pilih-jenjang", icon: IconSchool },
+      { name: "Formulir", href: "/dashboard/ppdb/formulir", icon: IconFileText },
+    );
+  }
+
+  // Always show these
+  navItems.push(
     { name: "Status Pendaftaran", href: "/dashboard/status", icon: IconClock },
     { name: "Pengumuman", href: "/dashboard/pengumuman", icon: IconNews },
-  ];
+  );
 
   return (
     <aside className="w-[240px] flex-shrink-0 bg-primary-800 h-screen flex flex-col text-white">
@@ -52,18 +82,17 @@ export function Sidebar() {
       {/* Bottom User Profile */}
       <div className="p-4 bg-primary-900 mt-auto space-y-3">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-900 flex items-center justify-center font-bold">
-            AD
+          <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-900 flex items-center justify-center font-bold text-sm">
+            {userName.substring(0, 2).toUpperCase()}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-semibold text-white truncate">Siswa Darul Furqan</span>
-            <span className="text-xs text-white/70">Calon Pendaftar</span>
+            <span className="text-sm font-semibold text-white truncate capitalize">{userName}</span>
+            <span className="text-xs text-white/70">{hasRegistration ? "Pendaftar" : "Calon Pendaftar"}</span>
           </div>
         </div>
         <Button 
           variant="ghost" 
           onClick={async () => {
-            const { supabase } = await import("@/lib/supabase");
             await supabase.auth.signOut();
             window.location.href = "/masuk";
           }}

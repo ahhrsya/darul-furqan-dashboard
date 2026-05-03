@@ -9,8 +9,7 @@ import { IconChevronRight, IconSchool, IconBuildingSkyscraper, IconBuildingMosqu
 import { supabase } from "@/lib/supabase";
 import { getRegistrations } from "@/lib/data";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+
 
 export default function PilihJenjangPage() {
   const [loading, setLoading] = useState(true);
