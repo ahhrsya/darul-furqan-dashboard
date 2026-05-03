@@ -72,9 +72,9 @@ export default function FormulirPage() {
           </div>
 
           <div className="flex justify-end pt-4 border-t border-neutral-100">
-            <Button asChild className="bg-primary-800 hover:bg-primary-700 text-white">
-              <Link href="/dashboard/ppdb/konfirmasi">Selanjutnya</Link>
-            </Button>
+            <Link href="/dashboard/ppdb/konfirmasi">
+              <Button className="bg-primary-800 hover:bg-primary-700 text-white">Selanjutnya</Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

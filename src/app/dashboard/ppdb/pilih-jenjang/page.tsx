@@ -74,9 +74,11 @@ export default function PilihJenjangPage() {
                   Kuota Penuh
                 </Button>
               ) : (
-                <Button asChild className="w-full bg-primary-800 hover:bg-primary-700 text-white">
-                  <Link href={`/dashboard/ppdb/formulir?jenjang=${item.id}`}>Pilih {item.name}</Link>
-                </Button>
+                <Link href={`/dashboard/ppdb/formulir?jenjang=${item.id}`}>
+                  <Button className="w-full bg-primary-800 hover:bg-primary-700 text-white">
+                    Pilih {item.name}
+                  </Button>
+                </Link>
               )}
             </CardFooter>
           </Card>

@@ -31,9 +31,11 @@ export default function UserDashboard() {
               <p className="text-neutral-600 text-sm max-w-md mx-auto">
                 Silakan pilih jenjang pendidikan dan lengkapi formulir pendaftaran untuk memulai proses penerimaan peserta didik baru.
               </p>
-              <Button asChild className="bg-primary-800 hover:bg-primary-700 text-white mt-4">
-                <Link href="/dashboard/ppdb/pilih-jenjang">Mulai Pendaftaran</Link>
-              </Button>
+              <Link href="/dashboard/ppdb/pilih-jenjang">
+                <Button className="bg-primary-800 hover:bg-primary-700 text-white mt-4">
+                  Mulai Pendaftaran
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

@@ -68,12 +68,16 @@ export default function KonfirmasiPage() {
       </div>
 
       <div className="flex items-center justify-between pt-4">
-        <Button variant="outline" asChild className="text-primary-800 border-primary-800">
-          <Link href="/dashboard/ppdb/formulir">Kembali & Edit</Link>
-        </Button>
-        <Button asChild className="bg-primary-800 hover:bg-primary-700 text-white">
-          <Link href="/dashboard/status">Kirim Pendaftaran</Link>
-        </Button>
+        <Link href="/dashboard/ppdb/formulir">
+          <Button variant="outline" className="text-primary-800 border-primary-800">
+            Kembali & Edit
+          </Button>
+        </Link>
+        <Link href="/dashboard/status">
+          <Button className="bg-primary-800 hover:bg-primary-700 text-white">
+            Kirim Pendaftaran
+          </Button>
+        </Link>
       </div>
     </div>
   );
