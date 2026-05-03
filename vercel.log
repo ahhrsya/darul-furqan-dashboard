@@ -1,16 +1,19 @@
 Retrieving project…
 Deploying rasyas-projects-c1fc3a82/dashboard-ppdb
-Uploading [--------------------] (0.0B/72B)
-Uploading [====================] (72.0B/72B)
-Inspect: https://vercel.com/rasyas-projects-c1fc3a82/dashboard-ppdb/EX8kzAnQHA8BzEVkmiY7qNzVHbgK [3s]
-Production: https://dashboard-ppdb-8gs8l2od3-rasyas-projects-c1fc3a82.vercel.app [3s]
-https://dashboard-ppdb-8gs8l2od3-rasyas-projects-c1fc3a82.vercel.appBuilding...
+Uploading [--------------------] (0.0B/127KB)
+Uploading [=====---------------] (32.0KB/127KB)
+Uploading [==========----------] (64.0KB/127KB)
+Uploading [===============-----] (95.9KB/127KB)
+Uploading [====================] (127.0KB/127KB)
+Inspect: https://vercel.com/rasyas-projects-c1fc3a82/dashboard-ppdb/83PLcF7suavDqSX33zvcKrqc7bGb [5s]
+Production: https://dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app [5s]
+https://dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.appBuilding...
 Building...
 Building: Running build in Washington, D.C., USA (East) – iad1
 Building: Build machine configuration: 2 cores, 8 GB
 Building: Retrieving list of deployment files...
 Building: Previous build caches not available.
-Building: Downloading 49 deployment files...
+Building: Downloading 50 deployment files...
 Building: Running "vercel build"
 Building: Vercel CLI 51.6.1
 Building: Installing dependencies...
@@ -29,6 +32,46 @@ Building: You can learn more, including how to opt-out if you'd not like to part
 Building: https://nextjs.org/telemetry
 Building: ▲ Next.js 16.2.4 (Turbopack)
 Building: Creating an optimized production build ...
-Building: ✓ Compiled successfully in 6.7s
+Building: ✓ Compiled successfully in 7.0s
 Building: Running TypeScript ...
-Error: Command "npm run build" exited with 1
+Building: Finished TypeScript in 4.6s ...
+Building: Collecting page data using 1 worker ...
+Building: Generating static pages using 1 worker (0/20) ...
+Building: Generating static pages using 1 worker (5/20)
+Building: Generating static pages using 1 worker (10/20)
+Building: Generating static pages using 1 worker (15/20)
+Building: ✓ Generating static pages using 1 worker (20/20) in 414ms
+Building: Finalizing page optimization ...
+Building: Running onBuildComplete from Vercel
+Building: Route (app)
+Building: ┌ ○ /
+Building: ├ ○ /_not-found
+Building: ├ ○ /admin/dashboard
+Building: ├ ○ /admin/konten
+Building: ├ ○ /admin/login
+Building: ├ ○ /admin/pendaftar
+Building: ├ ○ /admin/pengaturan/ppdb
+Building: ├ ○ /daftar
+Building: ├ ○ /dashboard
+Building: ├ ○ /dashboard/pengumuman
+Building: ├ ○ /dashboard/ppdb/formulir
+Building: ├ ○ /dashboard/ppdb/konfirmasi
+Building: ├ ○ /dashboard/ppdb/pilih-jenjang
+Building: ├ ○ /dashboard/status
+Building: ├ ○ /lupa-password
+Building: ├ ○ /masuk
+Building: ├ ○ /reset-password
+Building: └ ○ /verifikasi
+Building: ○  (Static)  prerendered as static content
+Building: Build Completed in /vercel/output [35s]
+Building: Deploying outputs...
+Building: Deployment completed
+Building: Creating build cache...
+[2K[1A[2K[GProduction: https://dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app [54s]
+Completing...
+Aliased: https://dashboard-ppdb.vercel.app [54s]
+
+Common next commands:
+- `vercel inspect dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app --logs`
+- `vercel redeploy dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app`
+> Tip: Run `npx plugins add vercel/vercel-plugin` to enhance your agent experience
