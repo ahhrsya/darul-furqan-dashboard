@@ -3,18 +3,23 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { IconChevronRight, IconSchool, IconBuildingSkyscraper, IconLoader2, IconCheck } from "@tabler/icons-react";
+import { IconChevronRight, IconSchool, IconBuildingSkyscraper, IconBuildingMosque, IconLoader2, IconCheck } from "@tabler/icons-react";
 import { supabase } from "@/lib/supabase";
 import { getRegistrations } from "@/lib/data";
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default function PilihJenjangPage() {
   const [loading, setLoading] = useState(true);
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
+  const [counts, setCounts] = useState({ SMP: 0, SMA: 0, PONDOK: 0 });
 
   useEffect(() => {
-    async function checkRegistration() {
+    async function checkRegistrationAndQuotas() {
+      // Check user registration
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const regs = await getRegistrations(user.id);
@@ -22,9 +27,19 @@ export default function PilihJenjangPage() {
           setAlreadyRegistered(true);
         }
       }
+
+      // Calculate real-time quotas
+      const { data: allRegs } = await supabase.from('registrations').select('jenjang');
+      if (allRegs) {
+        const smpCount = allRegs.filter(r => r.jenjang === 'SMP').length;
+        const smaCount = allRegs.filter(r => r.jenjang === 'SMA').length;
+        const pondokCount = allRegs.filter(r => r.jenjang === 'PONDOK').length;
+        setCounts({ SMP: smpCount, SMA: smaCount, PONDOK: pondokCount });
+      }
+      
       setLoading(false);
     }
-    checkRegistration();
+    checkRegistrationAndQuotas();
   }, []);
 
   if (loading) return <div className="h-[60vh] flex items-center justify-center"><IconLoader2 className="animate-spin text-primary-800" size={40} /></div>;
@@ -35,7 +50,7 @@ export default function PilihJenjangPage() {
         <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto"><IconCheck size={40} /></div>
         <h2 className="text-3xl font-heading font-bold text-neutral-900">Anda Sudah Terdaftar</h2>
         <p className="text-neutral-500 text-lg">Pendaftaran Anda sedang dalam proses verifikasi. Anda tidak perlu melakukan pendaftaran ulang.</p>
-        <Button onClick={() => window.location.href = "/dashboard/status"} className="bg-emerald-600 text-white font-bold px-10 py-6 h-auto rounded-2xl shadow-lg">Pantau Status Sekarang</Button>
+        <Button onClick={() => window.location.href = "/dashboard/status"} className="bg-emerald-600 text-white font-bold px-10 py-6 h-auto rounded-2xl shadow-lg hover:bg-emerald-700">Pantau Status Sekarang</Button>
       </div>
     );
   }
@@ -47,7 +62,8 @@ export default function PilihJenjangPage() {
       description: "Pendidikan tingkat menengah pertama dengan fokus tahfidz dan kurikulum nasional.",
       icon: IconSchool,
       color: "bg-blue-600",
-      stats: "Sisa Kuota: 45 Kursi"
+      quota: 45,
+      count: counts.SMP
     },
     {
       id: "SMA",
@@ -55,7 +71,17 @@ export default function PilihJenjangPage() {
       description: "Pendidikan tingkat menengah atas dengan persiapan masuk PTN dan penguatan adab.",
       icon: IconBuildingSkyscraper,
       color: "bg-emerald-600",
-      stats: "Sisa Kuota: 30 Kursi"
+      quota: 30,
+      count: counts.SMA
+    },
+    {
+      id: "PONDOK",
+      title: "Pondok Pesantren",
+      description: "Pendidikan diniyah intensif khusus asrama untuk mencetak kader ulama dan hafidz quran.",
+      icon: IconBuildingMosque,
+      color: "bg-gold-600",
+      quota: 20,
+      count: counts.PONDOK
     }
   ];
 
@@ -66,32 +92,47 @@ export default function PilihJenjangPage() {
         <p className="text-neutral-500 text-lg max-w-2xl mx-auto">Silakan pilih jenjang pendidikan yang ingin Anda tuju. Pastikan Anda memenuhi syarat usia untuk jenjang tersebut.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {jenjangs.map((j) => (
-          <Card key={j.id} className="group relative border-none shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl overflow-hidden bg-white">
-            <div className={`h-3 w-full ${j.color}`}></div>
-            <CardContent className="p-10 space-y-8">
-              <div className="flex items-start justify-between">
-                <div className={`w-20 h-20 ${j.color} text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-900/20 group-hover:scale-110 transition-transform duration-500`}>
-                  <j.icon size={40} />
-                </div>
-                <Badge variant="outline" className="text-neutral-500 border-neutral-200 px-4 py-1 rounded-full">{j.stats}</Badge>
-              </div>
-              
-              <div className="space-y-3">
-                <h3 className="text-2xl font-bold text-neutral-900">{j.title}</h3>
-                <p className="text-neutral-500 leading-relaxed">{j.description}</p>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {jenjangs.map((j) => {
+          const remainingQuota = Math.max(0, j.quota - j.count);
+          const isFull = remainingQuota === 0;
 
-              <Link href={`/dashboard/ppdb/formulir?jenjang=${j.id}`} className="block">
-                <Button className={`w-full py-8 rounded-2xl font-bold text-lg flex items-center justify-center space-x-3 transition-all duration-300 ${j.color} text-white shadow-lg`}>
-                  <span>Pilih Jenjang Ini</span>
-                  <IconChevronRight size={22} className="group-hover:translate-x-2 transition-transform" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
+          return (
+            <Card key={j.id} className={`group relative border-none shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl overflow-hidden bg-white flex flex-col ${isFull ? 'opacity-70 grayscale' : ''}`}>
+              <div className={`h-3 w-full ${j.color}`}></div>
+              <CardContent className="p-8 flex-1 flex flex-col justify-between space-y-8">
+                <div>
+                  <div className="flex items-start justify-between mb-6">
+                    <div className={`w-16 h-16 ${j.color} text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                      <j.icon size={32} />
+                    </div>
+                    <Badge variant={isFull ? "destructive" : "outline"} className={`px-3 py-1 rounded-full ${isFull ? 'bg-rose-500 text-white' : 'text-neutral-600 border-neutral-200'}`}>
+                      {isFull ? "Kuota Penuh" : `Sisa Kuota: ${remainingQuota}`}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-neutral-900">{j.title}</h3>
+                    <p className="text-neutral-500 text-sm leading-relaxed">{j.description}</p>
+                  </div>
+                </div>
+
+                {isFull ? (
+                  <Button disabled className="w-full py-6 rounded-xl font-bold text-base flex items-center justify-center bg-neutral-200 text-neutral-500">
+                    Kuota Telah Penuh
+                  </Button>
+                ) : (
+                  <Link href={`/dashboard/ppdb/formulir?jenjang=${j.id}`} className="block">
+                    <Button className={`w-full py-6 rounded-xl font-bold text-base flex items-center justify-center space-x-2 transition-all duration-300 ${j.color} text-white shadow-lg hover:brightness-110`}>
+                      <span>Pilih {j.id}</span>
+                      <IconChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

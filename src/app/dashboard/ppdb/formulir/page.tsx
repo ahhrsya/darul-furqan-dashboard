@@ -5,10 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { IconChevronRight, IconChevronLeft, IconCheck, IconLoader2, IconAlertCircle, IconUser, IconUsers, IconFileText, IconMapPin } from "@tabler/icons-react";
 import { supabase } from "@/lib/supabase";
 import { createRegistration, getRegistrations } from "@/lib/data";
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default function FormulirPage() {
   const router = useRouter();
@@ -74,7 +77,6 @@ export default function FormulirPage() {
       };
 
       await createRegistration(registrationData);
-      // HARD REDIRECT TO STATUS
       window.location.href = "/dashboard/status?success=true";
     } catch (error: any) {
       alert(error.message);
@@ -98,55 +100,43 @@ export default function FormulirPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-20">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-heading font-bold text-neutral-900">Formulir Pendaftaran</h1>
           <p className="text-neutral-500">Lengkapi data calon santri untuk jenjang <span className="font-bold text-primary-800">{jenjang}</span></p>
         </div>
-        <div className="flex items-center bg-primary-50 px-4 py-2 rounded-full text-primary-800 font-bold text-sm">
+        <div className="flex items-center bg-primary-50 px-4 py-2 rounded-full text-primary-800 font-bold text-sm shadow-sm">
           Step {step} dari 4
         </div>
       </div>
 
-      {/* Steps Indicator */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
           { label: "Data Siswa", icon: IconUser },
           { label: "Data Ortu", icon: IconUsers },
           { label: "Alamat", icon: IconMapPin },
           { label: "Review", icon: IconFileText }
         ].map((s, i) => (
-          <div key={i} className={`flex items-center space-x-3 p-4 rounded-2xl border transition-all ${step === i + 1 ? "bg-primary-800 text-white border-primary-800 shadow-lg shadow-primary-900/20" : step > i + 1 ? "bg-emerald-50 border-emerald-100 text-emerald-700" : "bg-white border-neutral-100 text-neutral-400"}`}>
+          <div key={i} className={`flex items-center space-x-3 p-3 md:p-4 rounded-2xl border transition-all ${step === i + 1 ? "bg-primary-800 text-white border-primary-800 shadow-lg shadow-primary-900/20" : step > i + 1 ? "bg-emerald-50 border-emerald-100 text-emerald-700" : "bg-white border-neutral-100 text-neutral-400"}`}>
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${step === i + 1 ? "bg-white/20" : "bg-neutral-50"}`}><s.icon size={18} /></div>
-            <span className="font-bold text-sm hidden md:block">{s.label}</span>
+            <span className="font-bold text-xs md:text-sm">{s.label}</span>
           </div>
         ))}
       </div>
 
       <Card className="border-none shadow-2xl shadow-neutral-200/50 rounded-3xl overflow-hidden">
-        <CardContent className="p-8 md:p-12">
+        <CardContent className="p-6 md:p-12">
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Nama Lengkap Santri</Label>
-                  <Input name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Sesuai Akta Kelahiran" className="py-6 rounded-xl border-neutral-200" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Jenis Kelamin</Label>
+                <div className="space-y-2"><Label>Nama Lengkap Santri</Label><Input name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Sesuai Akta Kelahiran" className="py-6 rounded-xl" /></div>
+                <div className="space-y-2"><Label>Jenis Kelamin</Label>
                   <select name="gender" value={formData.gender} onChange={handleChange} className="w-full h-12 px-4 rounded-xl border border-neutral-200 focus:ring-2 focus:ring-primary-800 outline-none">
-                    <option>Laki-laki</option>
-                    <option>Perempuan</option>
+                    <option>Laki-laki</option><option>Perempuan</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Tempat Lahir</Label>
-                  <Input name="pob" value={formData.pob} onChange={handleChange} placeholder="Kota/Kabupaten" className="py-6 rounded-xl border-neutral-200" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tanggal Lahir</Label>
-                  <Input type="date" name="dob" value={formData.dob} onChange={handleChange} className="py-6 rounded-xl border-neutral-200" />
-                </div>
+                <div className="space-y-2"><Label>Tempat Lahir</Label><Input name="pob" value={formData.pob} onChange={handleChange} placeholder="Kota/Kabupaten" className="py-6 rounded-xl" /></div>
+                <div className="space-y-2"><Label>Tanggal Lahir</Label><Input type="date" name="dob" value={formData.dob} onChange={handleChange} className="py-6 rounded-xl" /></div>
               </div>
             </div>
           )}
@@ -215,7 +205,7 @@ export default function FormulirPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="font-bold text-primary-800 border-b pb-2 flex items-center"><IconUsers size={18} className="mr-2" /> Data Orang Tua (Ayah)</h4>
+                  <h4 className="font-bold text-primary-800 border-b pb-2 flex items-center"><IconUsers size={18} className="mr-2" /> Data Ayah</h4>
                   <div className="grid grid-cols-2 gap-y-3 text-sm">
                     <span className="text-neutral-500">Nama Ayah</span><span className="font-bold">: {formData.father_name || "-"}</span>
                     <span className="text-neutral-500">NIK Ayah</span><span className="font-bold">: {formData.nik_father || "-"}</span>
@@ -225,7 +215,7 @@ export default function FormulirPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="font-bold text-rose-800 border-b pb-2 flex items-center"><IconUsers size={18} className="mr-2" /> Data Orang Tua (Ibu)</h4>
+                  <h4 className="font-bold text-rose-800 border-b pb-2 flex items-center"><IconUsers size={18} className="mr-2" /> Data Ibu</h4>
                   <div className="grid grid-cols-2 gap-y-3 text-sm">
                     <span className="text-neutral-500">Nama Ibu</span><span className="font-bold">: {formData.mother_name || "-"}</span>
                     <span className="text-neutral-500">NIK Ibu</span><span className="font-bold">: {formData.nik_mother || "-"}</span>
@@ -237,18 +227,19 @@ export default function FormulirPage() {
             </div>
           )}
 
-          <div className="mt-12 flex items-center justify-between pt-8 border-t border-neutral-100">
-            <Button variant="ghost" onClick={() => step > 1 ? setStep(step - 1) : router.back()} className="rounded-xl px-6">
+          <div className="mt-12 flex flex-col-reverse md:flex-row md:items-center justify-between pt-8 border-t border-neutral-100 gap-4">
+            <Button variant="outline" onClick={() => step > 1 ? setStep(step - 1) : window.location.href = "/dashboard/ppdb/pilih-jenjang"} className="rounded-xl px-6 py-6 h-auto w-full md:w-auto">
               <IconChevronLeft size={20} className="mr-2" /> Kembali
             </Button>
             
             {step < 4 ? (
-              <Button onClick={() => setStep(step + 1)} className="bg-primary-800 text-white rounded-xl px-8 py-6 h-auto shadow-lg shadow-primary-900/20 font-bold">
+              <Button onClick={() => setStep(step + 1)} className="bg-primary-800 text-white rounded-xl px-8 py-6 h-auto shadow-lg shadow-primary-900/20 font-bold w-full md:w-auto">
                 Lanjut <IconChevronRight size={20} className="ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit} disabled={submitting} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-12 py-6 h-auto shadow-lg shadow-emerald-900/20 font-bold">
-                {submitting ? <IconLoader2 className="animate-spin" /> : "Kirim Pendaftaran"}
+              <Button onClick={handleSubmit} disabled={submitting} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-12 py-6 h-auto shadow-lg shadow-emerald-900/20 font-bold w-full md:w-auto">
+                {submitting ? <IconLoader2 className="animate-spin mr-2" /> : <IconCheck className="mr-2" />} 
+                {submitting ? "Memproses..." : "Kirim Pendaftaran"}
               </Button>
             )}
           </div>

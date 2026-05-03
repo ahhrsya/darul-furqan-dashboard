@@ -1,8 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IconCalendarEvent, IconPin, IconDownload } from "@tabler/icons-react";
 
 export default function PengumumanPage() {
+  const [activeTab, setActiveTab] = useState("Semua");
+
   const announcements = [
     {
       id: 1,
@@ -17,60 +22,85 @@ export default function PengumumanPage() {
       id: 2,
       title: "Syarat Berkas Fisik untuk Registrasi Ulang",
       date: "10 Mei 2026",
-      category: "Persyaratan PPDB",
+      category: "Persyaratan",
       isPinned: false,
       content: "Bagi calon siswa yang nantinya dinyatakan DITERIMA, wajib melakukan registrasi ulang dengan membawa berkas fisik berupa fotokopi Akta Kelahiran, fotokopi KK, dan pas foto 3x4 masing-masing sebanyak 2 lembar ke sekretariat pendaftaran PPDB di kampus Darul Furqan.",
+      attachment: null
+    },
+    {
+      id: 3,
+      title: "Hasil Seleksi PPDB Gelombang 1 Diundur",
+      date: "05 Mei 2026",
+      category: "Pengumuman",
+      isPinned: false,
+      content: "Sehubungan dengan adanya pemeliharaan sistem server pusat, pengumuman hasil seleksi yang semula dijadwalkan tanggal 28 Mei akan diundur menjadi tanggal 30 Mei 2026.",
       attachment: null
     }
   ];
 
+  const filteredAnnouncements = activeTab === "Semua" 
+    ? announcements 
+    : announcements.filter(a => a.category === activeTab);
+
+  const tabs = ["Semua", "Pengumuman", "Jadwal PPDB", "Persyaratan"];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl mx-auto pb-20">
       <div>
         <h1 className="text-3xl font-heading font-bold text-neutral-900">Informasi & Pengumuman</h1>
         <p className="text-neutral-500 mt-2">Daftar informasi terbaru seputar proses Penerimaan Peserta Didik Baru.</p>
       </div>
 
       <div className="flex gap-2 pb-4 overflow-x-auto no-scrollbar">
-        <Badge variant="default" className="bg-primary-800 hover:bg-primary-700 cursor-pointer">Semua</Badge>
-        <Badge variant="outline" className="text-neutral-500 hover:text-neutral-900 cursor-pointer">Pengumuman</Badge>
-        <Badge variant="outline" className="text-neutral-500 hover:text-neutral-900 cursor-pointer">Jadwal PPDB</Badge>
-        <Badge variant="outline" className="text-neutral-500 hover:text-neutral-900 cursor-pointer">Persyaratan</Badge>
+        {tabs.map((tab) => (
+          <Badge 
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            variant={activeTab === tab ? "default" : "outline"} 
+            className={`cursor-pointer px-4 py-2 text-sm transition-all ${activeTab === tab ? 'bg-primary-800 hover:bg-primary-700 shadow-md' : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'}`}
+          >
+            {tab}
+          </Badge>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        {announcements.map((item) => (
-          <Card key={item.id} className={`border-neutral-200 shadow-sm ${item.isPinned ? 'border-l-4 border-l-gold-500' : ''}`}>
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4 justify-between md:items-start">
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+        {filteredAnnouncements.length > 0 ? (
+          filteredAnnouncements.map((item) => (
+            <Card key={item.id} className={`border-neutral-200 shadow-sm transition-all hover:shadow-md ${item.isPinned ? 'border-l-4 border-l-gold-500' : ''}`}>
+              <CardContent className="p-6 md:p-8">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     {item.isPinned && (
-                      <Badge className="bg-gold-100 text-gold-700 hover:bg-gold-100 border-none px-2 rounded flex items-center gap-1">
-                        <IconPin size={12} /> Penting
+                      <Badge className="bg-gold-100 text-gold-700 hover:bg-gold-100 border-none px-3 py-1 rounded flex items-center gap-1">
+                        <IconPin size={14} /> Penting
                       </Badge>
                     )}
-                    <span className="text-xs font-semibold text-primary-800 bg-primary-50 px-2 py-1 rounded">{item.category}</span>
-                    <span className="text-xs text-neutral-400 flex items-center gap-1">
+                    <span className="text-xs font-bold text-primary-800 bg-primary-50 px-3 py-1.5 rounded-md uppercase tracking-wider">{item.category}</span>
+                    <span className="text-xs font-medium text-neutral-500 flex items-center gap-1 ml-auto">
                       <IconCalendarEvent size={14} /> {item.date}
                     </span>
                   </div>
-                  <h3 className="text-xl font-heading font-semibold text-neutral-900">{item.title}</h3>
-                  <p className="text-neutral-600 text-sm leading-relaxed">{item.content}</p>
+                  <h3 className="text-xl md:text-2xl font-heading font-bold text-neutral-900">{item.title}</h3>
+                  <p className="text-neutral-600 leading-relaxed">{item.content}</p>
                   
                   {item.attachment && (
                     <div className="mt-4 pt-4 border-t border-neutral-100">
-                      <a href="#" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors">
-                        <IconDownload size={16} className="text-neutral-500" />
-                        Unduh Lampiran: {item.attachment}
+                      <a href="#" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-neutral-200 text-sm font-semibold text-neutral-700 hover:bg-primary-50 hover:text-primary-800 hover:border-primary-200 transition-colors">
+                        <IconDownload size={18} />
+                        Unduh Lampiran ({item.attachment})
                       </a>
                     </div>
                   )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="text-center py-20 bg-neutral-50 rounded-3xl border border-neutral-100">
+            <p className="text-neutral-500 font-medium">Belum ada informasi untuk kategori {activeTab}.</p>
+          </div>
+        )}
       </div>
     </div>
   );
