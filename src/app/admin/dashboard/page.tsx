@@ -1,14 +1,46 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconUsers, IconUserCheck, IconUserX, IconClock } from "@tabler/icons-react";
+import { IconUsers, IconUserCheck, IconUserX, IconClock, IconLoader2, IconArrowRight } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
+import { getAllRegistrations } from "@/lib/data";
 
 export default function AdminDashboardPage() {
+  const [registrations, setRegistrations] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      const data = await getAllRegistrations();
+      setRegistrations(data || []);
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  const total = registrations.length;
+  const diterima = registrations.filter(r => r.status === "Diterima").length;
+  const ditolak = registrations.filter(r => r.status === "Ditolak").length;
+  const pending = registrations.filter(r => r.status === "Pending").length;
+
   const stats = [
-    { title: "Total Pendaftar", value: "342", icon: IconUsers, trend: "+12%", trendUp: true, color: "text-blue-600", bg: "bg-blue-100" },
-    { title: "Diterima", value: "128", icon: IconUserCheck, trend: "+4%", trendUp: true, color: "text-green-600", bg: "bg-green-100" },
-    { title: "Tidak Diterima", value: "24", icon: IconUserX, trend: "-2%", trendUp: false, color: "text-red-600", bg: "bg-red-100" },
-    { title: "Menunggu Verifikasi", value: "85", icon: IconClock, trend: "+24%", trendUp: true, color: "text-amber-600", bg: "bg-amber-100" },
+    { title: "Total Pendaftar", value: total, icon: IconUsers, color: "text-blue-600", bg: "bg-blue-100" },
+    { title: "Diterima", value: diterima, icon: IconUserCheck, color: "text-green-600", bg: "bg-green-100" },
+    { title: "Ditolak", value: ditolak, icon: IconUserX, color: "text-red-600", bg: "bg-red-100" },
+    { title: "Menunggu Verifikasi", value: pending, icon: IconClock, color: "text-amber-600", bg: "bg-amber-100" },
   ];
+
+  const statusBadge = (s: string) => {
+    switch (s) {
+      case "Diterima": return "bg-emerald-100 text-emerald-800";
+      case "Ditolak": return "bg-red-100 text-red-800";
+      default: return "bg-amber-100 text-amber-800";
+    }
+  };
+
+  if (loading) return <div className="h-[60vh] flex items-center justify-center"><IconLoader2 className="animate-spin text-primary-800" size={40} /></div>;
 
   return (
     <div className="space-y-8">
@@ -25,9 +57,6 @@ export default function AdminDashboardPage() {
                 <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center`}>
                   <stat.icon size={24} />
                 </div>
-                <Badge variant="outline" className={`${stat.trendUp ? 'text-green-600 border-green-200 bg-green-50' : 'text-red-600 border-red-200 bg-red-50'}`}>
-                  {stat.trend}
-                </Badge>
               </div>
               <div className="mt-4">
                 <p className="text-3xl font-heading font-bold text-neutral-900">{stat.value}</p>
@@ -39,8 +68,11 @@ export default function AdminDashboardPage() {
       </div>
 
       <Card className="border-neutral-200 shadow-sm">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-xl font-heading">Pendaftar Terbaru</CardTitle>
+          <Link href="/admin/pendaftar" className="text-sm text-primary-800 font-semibold flex items-center hover:underline">
+            Lihat Semua <IconArrowRight size={14} className="ml-1" />
+          </Link>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -54,30 +86,18 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200">
-                <tr className="hover:bg-neutral-50 transition-colors">
-                  <td className="py-3 px-4 text-sm font-mono text-neutral-700">DF-PPDB-2026-0415</td>
-                  <td className="py-3 px-4 text-sm font-semibold text-neutral-900">Budi Santoso</td>
-                  <td className="py-3 px-4 text-sm text-neutral-600">SDIT Alam</td>
-                  <td className="py-3 px-4">
-                    <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 shadow-none">Menunggu Verifikasi</Badge>
-                  </td>
-                </tr>
-                <tr className="hover:bg-neutral-50 transition-colors">
-                  <td className="py-3 px-4 text-sm font-mono text-neutral-700">DF-PPDB-2026-0414</td>
-                  <td className="py-3 px-4 text-sm font-semibold text-neutral-900">Siti Aminah</td>
-                  <td className="py-3 px-4 text-sm text-neutral-600">PAUD Darul Furqan</td>
-                  <td className="py-3 px-4">
-                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 shadow-none">Sedang Diverifikasi</Badge>
-                  </td>
-                </tr>
-                <tr className="hover:bg-neutral-50 transition-colors">
-                  <td className="py-3 px-4 text-sm font-mono text-neutral-700">DF-PPDB-2026-0413</td>
-                  <td className="py-3 px-4 text-sm font-semibold text-neutral-900">Ahmad Dahlan</td>
-                  <td className="py-3 px-4 text-sm text-neutral-600">Pondok Pesantren</td>
-                  <td className="py-3 px-4">
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100 shadow-none">Diterima</Badge>
-                  </td>
-                </tr>
+                {registrations.length === 0 ? (
+                  <tr><td colSpan={4} className="py-12 text-center text-neutral-400">Belum ada pendaftar.</td></tr>
+                ) : (
+                  registrations.slice(0, 5).map((reg) => (
+                    <tr key={reg.id as string} className="hover:bg-neutral-50 transition-colors">
+                      <td className="py-3 px-4 text-sm font-mono text-neutral-700">{reg.registration_number as string}</td>
+                      <td className="py-3 px-4 text-sm font-semibold text-neutral-900">{reg.student_name as string || "-"}</td>
+                      <td className="py-3 px-4 text-sm text-neutral-600">{reg.jenjang as string}</td>
+                      <td className="py-3 px-4"><Badge className={`${statusBadge(reg.status as string)} hover:opacity-90 shadow-none`}>{reg.status as string}</Badge></td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
