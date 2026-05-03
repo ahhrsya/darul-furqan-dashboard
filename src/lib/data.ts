@@ -129,3 +129,43 @@ export async function deleteAnnouncement(id: string) {
     throw error;
   }
 }
+
+// ============ GALLERY ============
+
+export async function getGallery() {
+  const { data, error } = await supabase
+    .from('gallery')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching gallery:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function createGalleryItem(item: Record<string, unknown>) {
+  const { data, error } = await supabase
+    .from('gallery')
+    .insert([item])
+    .select();
+
+  if (error) {
+    console.error('Error creating gallery item:', error);
+    throw error;
+  }
+  return data;
+}
+
+export async function deleteGalleryItem(id: string) {
+  const { error } = await supabase
+    .from('gallery')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting gallery item:', error);
+    throw error;
+  }
+}

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { IconSearch, IconCheck, IconX, IconTrash, IconLoader2, IconEye } from "@tabler/icons-react";
+import { IconSearch, IconCheck, IconX, IconTrash, IconLoader2, IconEye, IconAlertCircle } from "@tabler/icons-react";
 import { getAllRegistrations, updateRegistrationStatus, deleteRegistration } from "@/lib/data";
 
 export default function PendaftarPage() {
@@ -17,6 +17,8 @@ export default function PendaftarPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionError, setActionError] = useState("");
 
   const loadData = async () => {
     const data = await getAllRegistrations();
@@ -28,22 +30,49 @@ export default function PendaftarPage() {
 
   const handleApprove = async (id: string) => {
     if (!confirm("Yakin ingin menerima pendaftaran ini?")) return;
-    await updateRegistrationStatus(id, "Diterima");
-    loadData();
+    setActionLoading(id);
+    setActionError("");
+    try {
+      await updateRegistrationStatus(id, "Diterima");
+      await loadData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Gagal mengubah status.";
+      setActionError(msg);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleReject = async (id: string) => {
-    if (!rejectReason.trim()) { alert("Isi alasan penolakan."); return; }
-    await updateRegistrationStatus(id, "Ditolak", rejectReason);
-    setRejectingId(null);
-    setRejectReason("");
-    loadData();
+    if (!rejectReason.trim()) { alert("Isi alasan penolakan terlebih dahulu."); return; }
+    setActionLoading(id);
+    setActionError("");
+    try {
+      await updateRegistrationStatus(id, "Ditolak", rejectReason);
+      setRejectingId(null);
+      setRejectReason("");
+      await loadData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Gagal menolak pendaftaran.";
+      setActionError(msg);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Yakin ingin menghapus data ini? Tindakan ini tidak bisa dibatalkan.")) return;
-    await deleteRegistration(id);
-    loadData();
+    setActionLoading(id);
+    setActionError("");
+    try {
+      await deleteRegistration(id);
+      await loadData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Gagal menghapus data.";
+      setActionError(msg);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const statusBadge = (s: string) => {
@@ -72,6 +101,18 @@ export default function PendaftarPage() {
         <h1 className="text-3xl font-heading font-bold text-neutral-900">Data Pendaftar</h1>
         <p className="text-neutral-500 mt-2">Kelola dan verifikasi data calon peserta didik baru. Total: <strong>{registrations.length}</strong></p>
       </div>
+
+      {/* Error Alert */}
+      {actionError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-3 text-red-800">
+          <IconAlertCircle size={20} className="shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-sm">Terjadi Kesalahan</p>
+            <p className="text-sm mt-1">{actionError}</p>
+          </div>
+          <button onClick={() => setActionError("")} className="ml-auto"><IconX size={16} /></button>
+        </div>
+      )}
 
       <Card className="border-neutral-200 shadow-sm">
         <CardContent className="p-0">
@@ -112,66 +153,69 @@ export default function PendaftarPage() {
                 {filtered.length === 0 ? (
                   <tr><td colSpan={6} className="py-12 text-center text-neutral-400">Tidak ada data pendaftar.</td></tr>
                 ) : (
-                  filtered.map((reg) => (
-                    <>
-                      <tr key={reg.id as string} className="hover:bg-neutral-50 transition-colors">
+                  filtered.map((reg) => {
+                    const id = reg.id as string;
+                    const isLoading = actionLoading === id;
+                    return (
+                      <tr key={id} className={`hover:bg-neutral-50 transition-colors ${isLoading ? "opacity-50 pointer-events-none" : ""}`}>
                         <td className="py-4 px-4 text-sm font-mono text-neutral-700">{reg.registration_number as string}</td>
-                        <td className="py-4 px-4 text-sm font-semibold text-neutral-900">{reg.student_name as string || "-"}</td>
+                        <td className="py-4 px-4">
+                          <div>
+                            <p className="text-sm font-semibold text-neutral-900">{reg.student_name as string || "-"}</p>
+                            {/* Expandable detail inline */}
+                            {expandedId === id && (
+                              <div className="mt-3 p-3 bg-blue-50 rounded-lg grid grid-cols-2 gap-2 text-xs">
+                                <div><span className="text-neutral-400">Gender:</span> <strong>{reg.gender as string || "-"}</strong></div>
+                                <div><span className="text-neutral-400">TTL:</span> <strong>{reg.pob as string || "-"}, {reg.dob as string || "-"}</strong></div>
+                                <div><span className="text-neutral-400">Ayah:</span> <strong>{reg.father_name as string || "-"}</strong></div>
+                                <div><span className="text-neutral-400">HP Ayah:</span> <strong>{reg.father_phone as string || "-"}</strong></div>
+                                <div><span className="text-neutral-400">Ibu:</span> <strong>{reg.mother_name as string || "-"}</strong></div>
+                                <div><span className="text-neutral-400">HP Ibu:</span> <strong>{reg.mother_phone as string || "-"}</strong></div>
+                                <div className="col-span-2"><span className="text-neutral-400">Alamat:</span> <strong>{reg.address as string || "-"}, {reg.district as string || "-"}</strong></div>
+                              </div>
+                            )}
+                            {/* Reject reason input inline */}
+                            {rejectingId === id && (
+                              <div className="mt-3 p-3 bg-red-50 rounded-lg flex gap-2 items-center">
+                                <Input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Tulis alasan penolakan..." className="flex-1 bg-white text-sm h-9" />
+                                <Button onClick={() => handleReject(id)} size="sm" className="bg-red-600 text-white hover:bg-red-700 h-9 px-4">Tolak</Button>
+                                <Button variant="ghost" size="sm" onClick={() => { setRejectingId(null); setRejectReason(""); }} className="h-9">Batal</Button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
                         <td className="py-4 px-4 text-sm text-neutral-600">{reg.jenjang as string}</td>
                         <td className="py-4 px-4 text-sm text-neutral-600">{new Date(reg.created_at as string).toLocaleDateString('id-ID')}</td>
                         <td className="py-4 px-4"><Badge className={`${statusBadge(reg.status as string)} hover:opacity-90 shadow-none`}>{reg.status as string}</Badge></td>
                         <td className="py-4 px-4 text-center">
                           <div className="flex items-center justify-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => setExpandedId(expandedId === reg.id ? null : reg.id as string)} title="Detail">
-                              <IconEye size={16} />
-                            </Button>
-                            {reg.status === "Pending" && (
+                            {isLoading ? (
+                              <IconLoader2 className="animate-spin text-neutral-400" size={16} />
+                            ) : (
                               <>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" onClick={() => handleApprove(reg.id as string)} title="Terima">
-                                  <IconCheck size={16} />
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => setExpandedId(expandedId === id ? null : id)} title="Detail">
+                                  <IconEye size={16} />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={() => setRejectingId(reg.id as string)} title="Tolak">
-                                  <IconX size={16} />
+                                {(reg.status === "Pending" || reg.status === "Sedang Diverifikasi") && (
+                                  <>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" onClick={() => handleApprove(id)} title="Terima">
+                                      <IconCheck size={16} />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-orange-600 hover:bg-orange-50" onClick={() => setRejectingId(rejectingId === id ? null : id)} title="Tolak">
+                                      <IconX size={16} />
+                                    </Button>
+                                  </>
+                                )}
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={() => handleDelete(id)} title="Hapus">
+                                  <IconTrash size={16} />
                                 </Button>
                               </>
                             )}
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={() => handleDelete(reg.id as string)} title="Hapus">
-                              <IconTrash size={16} />
-                            </Button>
                           </div>
                         </td>
                       </tr>
-                      {/* Detail Row */}
-                      {expandedId === reg.id && (
-                        <tr key={`detail-${reg.id}`} className="bg-blue-50/50">
-                          <td colSpan={6} className="px-6 py-4">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                              <div><span className="text-neutral-400 text-xs block">Gender</span><strong>{reg.gender as string || "-"}</strong></div>
-                              <div><span className="text-neutral-400 text-xs block">TTL</span><strong>{reg.pob as string}, {reg.dob as string}</strong></div>
-                              <div><span className="text-neutral-400 text-xs block">Ayah</span><strong>{reg.father_name as string || "-"}</strong></div>
-                              <div><span className="text-neutral-400 text-xs block">HP Ayah</span><strong>{reg.father_phone as string || "-"}</strong></div>
-                              <div><span className="text-neutral-400 text-xs block">Ibu</span><strong>{reg.mother_name as string || "-"}</strong></div>
-                              <div><span className="text-neutral-400 text-xs block">HP Ibu</span><strong>{reg.mother_phone as string || "-"}</strong></div>
-                              <div><span className="text-neutral-400 text-xs block">Alamat</span><strong>{reg.address as string || "-"}</strong></div>
-                              <div><span className="text-neutral-400 text-xs block">Kecamatan</span><strong>{reg.district as string || "-"}</strong></div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                      {/* Reject Reason Input */}
-                      {rejectingId === reg.id && (
-                        <tr key={`reject-${reg.id}`} className="bg-red-50/50">
-                          <td colSpan={6} className="px-6 py-4">
-                            <div className="flex gap-3 items-center">
-                              <Input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Alasan penolakan..." className="flex-1 bg-white" />
-                              <Button onClick={() => handleReject(reg.id as string)} className="bg-red-600 text-white hover:bg-red-700">Tolak</Button>
-                              <Button variant="ghost" onClick={() => { setRejectingId(null); setRejectReason(""); }}>Batal</Button>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>
