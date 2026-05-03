@@ -5,9 +5,16 @@ import { IconCheck, IconClock, IconAlertCircle } from "@tabler/icons-react";
 export default function StatusPage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-heading font-bold text-neutral-900">Status Pendaftaran</h1>
-        <p className="text-neutral-500 mt-2">Pantau progres pendaftaran putra-putri Anda secara real-time.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-heading font-bold text-neutral-900">Status Pendaftaran</h1>
+          <p className="text-neutral-500 mt-2">Pantau progres pendaftaran putra-putri Anda secara real-time.</p>
+        </div>
+        <Link href="/dashboard">
+          <Button variant="outline" className="border-neutral-200 text-neutral-600 hover:text-primary-800 hover:bg-primary-50">
+            <IconChevronLeft size={18} className="mr-1" /> Kembali ke Beranda
+          </Button>
+        </Link>
       </div>
 
       <Card className="border-neutral-200 shadow-sm overflow-hidden">

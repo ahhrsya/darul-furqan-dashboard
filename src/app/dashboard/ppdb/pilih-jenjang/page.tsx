@@ -13,6 +13,7 @@ export default function PilihJenjangPage() {
       icon: IconMoodKid,
       kuotaTotal: 50,
       sisaKuota: 12,
+      periode: "1 Mei - 30 Juni 2026",
       disabled: false,
     },
     {
@@ -22,6 +23,7 @@ export default function PilihJenjangPage() {
       icon: IconBook,
       kuotaTotal: 120,
       sisaKuota: 45,
+      periode: "1 Mei - 30 Juni 2026",
       disabled: false,
     },
     {
@@ -31,6 +33,7 @@ export default function PilihJenjangPage() {
       icon: IconBuildingMosque,
       kuotaTotal: 100,
       sisaKuota: 0,
+      periode: "1 April - 31 Mei 2026",
       disabled: true,
     },
   ];
@@ -56,6 +59,10 @@ export default function PilihJenjangPage() {
             </CardHeader>
             <CardContent className="text-center pb-4">
               <div className="flex flex-col space-y-2 mt-4 bg-white border border-neutral-100 rounded-lg p-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-500">Periode</span>
+                  <span className="font-semibold text-neutral-900">{item.periode}</span>
+                </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-neutral-500">Kuota Total</span>
                   <span className="font-semibold text-neutral-900">{item.kuotaTotal} Siswa</span>

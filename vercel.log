@@ -1,24 +1,21 @@
 Retrieving project…
 Deploying rasyas-projects-c1fc3a82/dashboard-ppdb
-Uploading [--------------------] (0.0B/127KB)
-Uploading [=====---------------] (32.0KB/127KB)
-Uploading [==========----------] (64.0KB/127KB)
-Uploading [===============-----] (95.9KB/127KB)
-Uploading [====================] (127.0KB/127KB)
-Inspect: https://vercel.com/rasyas-projects-c1fc3a82/dashboard-ppdb/83PLcF7suavDqSX33zvcKrqc7bGb [5s]
-Production: https://dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app [5s]
-https://dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.appBuilding...
+Uploading [--------------------] (0.0B/5.1KB)
+Uploading [==========----------] (2.6KB/5.1KB)
+Uploading [====================] (5.1KB/5.1KB)
+Inspect: https://vercel.com/rasyas-projects-c1fc3a82/dashboard-ppdb/2BTxinpd2uZXn3NA3egYhuCTkVJ9 [3s]
+Production: https://dashboard-ppdb-dga5nx5j2-rasyas-projects-c1fc3a82.vercel.app [3s]
+https://dashboard-ppdb-dga5nx5j2-rasyas-projects-c1fc3a82.vercel.appBuilding...
 Building...
 Building: Running build in Washington, D.C., USA (East) – iad1
 Building: Build machine configuration: 2 cores, 8 GB
 Building: Retrieving list of deployment files...
-Building: Previous build caches not available.
 Building: Downloading 50 deployment files...
+Building: Restored build cache from previous deployment (83PLcF7suavDqSX33zvcKrqc7bGb)
 Building: Running "vercel build"
 Building: Vercel CLI 51.6.1
 Building: Installing dependencies...
-Building: npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
-Building: added 636 packages in 20s
+Building: up to date in 1s
 Building: 237 packages are looking for funding
 Building: run `npm fund` for details
 Building: Detected Next.js version: 16.2.4
@@ -26,21 +23,17 @@ Building: Running "npm run build"
 Building: > dashboard-ppdb@0.1.0 build
 Building: > next build
 Building: Applying modifyConfig from Vercel
-Building: Attention: Next.js now collects completely anonymous telemetry regarding usage.
-Building: This information is used to shape Next.js' roadmap and prioritize features.
-Building: You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-Building: https://nextjs.org/telemetry
 Building: ▲ Next.js 16.2.4 (Turbopack)
 Building: Creating an optimized production build ...
-Building: ✓ Compiled successfully in 7.0s
+Building: ✓ Compiled successfully in 6.8s
 Building: Running TypeScript ...
-Building: Finished TypeScript in 4.6s ...
+Building: Finished TypeScript in 4.7s ...
 Building: Collecting page data using 1 worker ...
 Building: Generating static pages using 1 worker (0/20) ...
 Building: Generating static pages using 1 worker (5/20)
 Building: Generating static pages using 1 worker (10/20)
 Building: Generating static pages using 1 worker (15/20)
-Building: ✓ Generating static pages using 1 worker (20/20) in 414ms
+Building: ✓ Generating static pages using 1 worker (20/20) in 403ms
 Building: Finalizing page optimization ...
 Building: Running onBuildComplete from Vercel
 Building: Route (app)
@@ -63,15 +56,13 @@ Building: ├ ○ /masuk
 Building: ├ ○ /reset-password
 Building: └ ○ /verifikasi
 Building: ○  (Static)  prerendered as static content
-Building: Build Completed in /vercel/output [35s]
+Building: Build Completed in /vercel/output [16s]
 Building: Deploying outputs...
-Building: Deployment completed
-Building: Creating build cache...
-[2K[1A[2K[GProduction: https://dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app [54s]
+[2K[1A[2K[GProduction: https://dashboard-ppdb-dga5nx5j2-rasyas-projects-c1fc3a82.vercel.app [30s]
 Completing...
-Aliased: https://dashboard-ppdb.vercel.app [54s]
+Aliased: https://dashboard-ppdb.vercel.app [30s]
 
 Common next commands:
-- `vercel inspect dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app --logs`
-- `vercel redeploy dashboard-ppdb-prt1fl07h-rasyas-projects-c1fc3a82.vercel.app`
+- `vercel inspect dashboard-ppdb-dga5nx5j2-rasyas-projects-c1fc3a82.vercel.app --logs`
+- `vercel redeploy dashboard-ppdb-dga5nx5j2-rasyas-projects-c1fc3a82.vercel.app`
 > Tip: Run `npx plugins add vercel/vercel-plugin` to enhance your agent experience
