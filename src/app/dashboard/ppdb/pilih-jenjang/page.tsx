@@ -1,85 +1,97 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconMoodKid, IconBook, IconBuildingMosque } from "@tabler/icons-react";
-import { getJenjangSettings } from "@/lib/data";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { IconChevronRight, IconSchool, IconBuildingSkyscraper, IconLoader2, IconCheck } from "@tabler/icons-react";
+import { supabase } from "@/lib/supabase";
+import { getRegistrations } from "@/lib/data";
 
-// Fallback data if Supabase is not connected
-const MOCK_JENJANG = [
-  { id: "paud", name: "PAUD Darul Furqan", desc: "Rentang Usia: 3 - 6 Tahun", icon: IconMoodKid, kuota_total: 50, kuota_remaining: 12, periode_start: "2026-05-01", periode_end: "2026-06-30", is_open: true },
-  { id: "sdit", name: "SDIT Alam", desc: "Kelas 1 - 6", icon: IconBook, kuota_total: 120, kuota_remaining: 45, periode_start: "2026-05-01", periode_end: "2026-06-30", is_open: true },
-  { id: "ponpes", name: "Pondok Pesantren", desc: "SMP & SMA", icon: IconBuildingMosque, kuota_total: 100, kuota_remaining: 0, periode_start: "2026-04-01", periode_end: "2026-05-31", is_open: false },
-];
+export default function PilihJenjangPage() {
+  const [loading, setLoading] = useState(true);
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
-const ICON_MAP: { [key: string]: any } = {
-  paud: IconMoodKid,
-  sdit: IconBook,
-  ponpes: IconBuildingMosque,
-};
+  useEffect(() => {
+    async function checkRegistration() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const regs = await getRegistrations(user.id);
+        if (regs && regs.length > 0) {
+          setAlreadyRegistered(true);
+        }
+      }
+      setLoading(false);
+    }
+    checkRegistration();
+  }, []);
 
-export default async function PilihJenjangPage() {
-  const settings = await getJenjangSettings();
-  const displayData = settings && settings.length > 0 ? settings : MOCK_JENJANG;
+  if (loading) return <div className="h-[60vh] flex items-center justify-center"><IconLoader2 className="animate-spin text-primary-800" size={40} /></div>;
+
+  if (alreadyRegistered) {
+    return (
+      <div className="max-w-2xl mx-auto mt-10 text-center space-y-6 p-10 bg-white rounded-3xl shadow-xl border border-neutral-100">
+        <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto"><IconCheck size={40} /></div>
+        <h2 className="text-3xl font-heading font-bold text-neutral-900">Anda Sudah Terdaftar</h2>
+        <p className="text-neutral-500 text-lg">Pendaftaran Anda sedang dalam proses verifikasi. Anda tidak perlu melakukan pendaftaran ulang.</p>
+        <Button onClick={() => window.location.href = "/dashboard/status"} className="bg-emerald-600 text-white font-bold px-10 py-6 h-auto rounded-2xl shadow-lg">Pantau Status Sekarang</Button>
+      </div>
+    );
+  }
+
+  const jenjangs = [
+    {
+      id: "SMP",
+      title: "SMP IT Darul Furqon",
+      description: "Pendidikan tingkat menengah pertama dengan fokus tahfidz dan kurikulum nasional.",
+      icon: IconSchool,
+      color: "bg-blue-600",
+      stats: "Sisa Kuota: 45 Kursi"
+    },
+    {
+      id: "SMA",
+      title: "SMA IT Darul Furqon",
+      description: "Pendidikan tingkat menengah atas dengan persiapan masuk PTN dan penguatan adab.",
+      icon: IconBuildingSkyscraper,
+      color: "bg-emerald-600",
+      stats: "Sisa Kuota: 30 Kursi"
+    }
+  ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-heading font-bold text-neutral-900">Pilih Jenjang Pendidikan</h1>
-        <p className="text-neutral-500 mt-2">
-          Pilih jenjang pendidikan yang sesuai untuk pendaftaran. Pastikan pilihan Anda benar karena tidak dapat diubah setelah formulir dikirim.
-        </p>
+    <div className="space-y-10 max-w-5xl mx-auto pb-20">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-heading font-bold text-neutral-900">Pilih Jenjang Pendidikan</h1>
+        <p className="text-neutral-500 text-lg max-w-2xl mx-auto">Silakan pilih jenjang pendidikan yang ingin Anda tuju. Pastikan Anda memenuhi syarat usia untuk jenjang tersebut.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {displayData.map((item: any) => {
-          const IconComp = ICON_MAP[item.jenjang_id || item.id] || IconBook;
-          const isDisabled = !item.is_open || item.kuota_remaining <= 0;
-          
-          return (
-            <Card key={item.id} className={`border-neutral-200 shadow-sm relative overflow-hidden transition-all ${isDisabled ? 'opacity-70 bg-neutral-50' : 'hover:border-primary-800 hover:shadow-md'}`}>
-              <CardHeader className="text-center pb-2">
-                <div className={`mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4 ${isDisabled ? 'bg-neutral-200 text-neutral-500' : 'bg-primary-100 text-primary-800'}`}>
-                  <IconComp size={32} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {jenjangs.map((j) => (
+          <Card key={j.id} className="group relative border-none shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl overflow-hidden bg-white">
+            <div className={`h-3 w-full ${j.color}`}></div>
+            <CardContent className="p-10 space-y-8">
+              <div className="flex items-start justify-between">
+                <div className={`w-20 h-20 ${j.color} text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-900/20 group-hover:scale-110 transition-transform duration-500`}>
+                  <j.icon size={40} />
                 </div>
-                <CardTitle className="text-xl font-heading">{item.name}</CardTitle>
-                <CardDescription>{item.desc || (item.jenjang_id === 'ponpes' ? 'SMP & SMA' : 'Pendidikan Dasar')}</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center pb-4">
-                <div className="flex flex-col space-y-2 mt-4 bg-white border border-neutral-100 rounded-lg p-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-500">Periode</span>
-                    <span className="font-semibold text-neutral-900 text-[10px]">
-                      {item.periode_start && item.periode_end ? `${new Date(item.periode_start).toLocaleDateString('id-ID')} - ${new Date(item.periode_end).toLocaleDateString('id-ID')}` : 'Belum Dibuka'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-500">Kuota Total</span>
-                    <span className="font-semibold text-neutral-900">{item.kuota_total} Siswa</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-500">Sisa Kuota</span>
-                    <span className={`font-bold ${item.kuota_remaining > 0 ? 'text-primary-700' : 'text-red-500'}`}>
-                      {item.kuota_remaining} Siswa
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                {isDisabled ? (
-                  <Button disabled className="w-full bg-neutral-200 text-neutral-500 cursor-not-allowed">
-                    {item.kuota_remaining <= 0 ? 'Kuota Penuh' : 'Pendaftaran Tutup'}
-                  </Button>
-                ) : (
-                  <Link href={`/dashboard/ppdb/formulir?jenjang=${item.jenjang_id || item.id}`} className="w-full">
-                    <Button className="w-full bg-primary-800 hover:bg-primary-700 text-white">
-                      Pilih {item.name}
-                    </Button>
-                  </Link>
-                )}
-              </CardFooter>
-            </Card>
-          );
-        })}
+                <Badge variant="outline" className="text-neutral-500 border-neutral-200 px-4 py-1 rounded-full">{j.stats}</Badge>
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="text-2xl font-bold text-neutral-900">{j.title}</h3>
+                <p className="text-neutral-500 leading-relaxed">{j.description}</p>
+              </div>
+
+              <Link href={`/dashboard/ppdb/formulir?jenjang=${j.id}`} className="block">
+                <Button className={`w-full py-8 rounded-2xl font-bold text-lg flex items-center justify-center space-x-3 transition-all duration-300 ${j.color} text-white shadow-lg`}>
+                  <span>Pilih Jenjang Ini</span>
+                  <IconChevronRight size={22} className="group-hover:translate-x-2 transition-transform" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
