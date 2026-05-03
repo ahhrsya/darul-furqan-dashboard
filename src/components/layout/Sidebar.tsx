@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconLayoutDashboard, IconSchool, IconClock, IconFileText, IconNews } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -49,16 +50,27 @@ export function Sidebar() {
       <div className="border-t border-white/10 mx-4" />
 
       {/* Bottom User Profile */}
-      <div className="p-4 bg-primary-900 mt-auto">
+      <div className="p-4 bg-primary-900 mt-auto space-y-3">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-900 flex items-center justify-center font-bold">
             AD
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-white">Ahmad Dahlan</span>
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-sm font-semibold text-white truncate">Siswa Darul Furqan</span>
             <span className="text-xs text-white/70">Calon Pendaftar</span>
           </div>
         </div>
+        <Button 
+          variant="ghost" 
+          onClick={async () => {
+            const { supabase } = await import("@/lib/supabase");
+            await supabase.auth.signOut();
+            window.location.href = "/masuk";
+          }}
+          className="w-full justify-start text-white/70 hover:text-white hover:bg-white/10 text-xs px-2 h-8"
+        >
+          Keluar Sesi
+        </Button>
       </div>
     </aside>
   );

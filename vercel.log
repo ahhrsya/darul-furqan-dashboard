@@ -1,18 +1,17 @@
 Retrieving project…
 Deploying rasyas-projects-c1fc3a82/dashboard-ppdb
-Uploading [--------------------] (0.0B/29.6KB)
-Uploading [=============-------] (20.6KB/29.6KB)
-Uploading [=================---] (25.8KB/29.6KB)
-Uploading [====================] (29.6KB/29.6KB)
-Inspect: https://vercel.com/rasyas-projects-c1fc3a82/dashboard-ppdb/H8TXycw7UF5CVqwr94Uts43TVCmm [3s]
-Production: https://dashboard-ppdb-d93kxf67t-rasyas-projects-c1fc3a82.vercel.app [3s]
-https://dashboard-ppdb-d93kxf67t-rasyas-projects-c1fc3a82.vercel.appBuilding...
+Uploading [--------------------] (0.0B/6.1KB)
+Uploading [==========----------] (3.1KB/6.1KB)
+Uploading [====================] (6.1KB/6.1KB)
+Inspect: https://vercel.com/rasyas-projects-c1fc3a82/dashboard-ppdb/CXJL4yGF6soZGuY3AHDxVSXCSp6D [3s]
+Production: https://dashboard-ppdb-e0gc0v12s-rasyas-projects-c1fc3a82.vercel.app [3s]
+https://dashboard-ppdb-e0gc0v12s-rasyas-projects-c1fc3a82.vercel.appBuilding...
 Building...
 Building: Running build in Washington, D.C., USA (East) – iad1
 Building: Build machine configuration: 2 cores, 8 GB
 Building: Retrieving list of deployment files...
-Building: Downloading 50 deployment files...
-Building: Restored build cache from previous deployment (2BTxinpd2uZXn3NA3egYhuCTkVJ9)
+Building: Downloading 53 deployment files...
+Building: Restored build cache from previous deployment (EbYLtaD2vN2rZLGqPwpqKLaGJSxt)
 Building: Running "vercel build"
 Building: Vercel CLI 51.6.1
 Building: Installing dependencies...
@@ -26,18 +25,47 @@ Building: > next build
 Building: Applying modifyConfig from Vercel
 Building: ▲ Next.js 16.2.4 (Turbopack)
 Building: Creating an optimized production build ...
-Building: ✓ Compiled successfully in 7.4s
+Building: ✓ Compiled successfully in 8.5s
 Building: Running TypeScript ...
-Building: Failed to type check.
-Building: ./src/app/dashboard/status/page.tsx:13:10
-Building: Type error: Cannot find name 'Link'.
-Building: 11 |           <p className="text-neutral-500 mt-2">Pantau progres pendaftaran putra-putri Anda...
-Building: 12 |         </div>
-Building: > 13 |         <Link href="/dashboard">
-Building: |          ^
-Building: 14 |           <Button variant="outline" className="border-neutral-200 text-neutral-600 hover:t...
-Building: 15 |             <IconChevronLeft size={18} className="mr-1" /> Kembali ke Beranda
-Building: 16 |           </Button>
-Building: Next.js build worker exited with code: 1 and signal: null
-Building: Error: Command "npm run build" exited with 1
-Error: Command "npm run build" exited with 1
+Building: Finished TypeScript in 5.2s ...
+Building: Collecting page data using 1 worker ...
+Building: Generating static pages using 1 worker (0/20) ...
+Building: Generating static pages using 1 worker (5/20)
+Building: Generating static pages using 1 worker (10/20)
+Building: Generating static pages using 1 worker (15/20)
+Building: ✓ Generating static pages using 1 worker (20/20) in 1626ms
+Building: Finalizing page optimization ...
+Building: Running onBuildComplete from Vercel
+Building: Detected .env file, it is strongly recommended to use Vercel's env handling instead
+Building: Route (app)
+Building: ┌ ○ /
+Building: ├ ○ /_not-found
+Building: ├ ○ /admin/dashboard
+Building: ├ ○ /admin/konten
+Building: ├ ○ /admin/login
+Building: ├ ○ /admin/pendaftar
+Building: ├ ○ /admin/pengaturan/ppdb
+Building: ├ ○ /daftar
+Building: ├ ○ /dashboard
+Building: ├ ○ /dashboard/pengumuman
+Building: ├ ○ /dashboard/ppdb/formulir
+Building: ├ ○ /dashboard/ppdb/konfirmasi
+Building: ├ ○ /dashboard/ppdb/pilih-jenjang
+Building: ├ ○ /dashboard/status
+Building: ├ ○ /lupa-password
+Building: ├ ○ /masuk
+Building: ├ ○ /reset-password
+Building: └ ○ /verifikasi
+Building: ○  (Static)  prerendered as static content
+Building: Build Completed in /vercel/output [19s]
+Building: Deploying outputs...
+Building: Deployment completed
+Building: Creating build cache...
+[2K[1A[2K[GProduction: https://dashboard-ppdb-e0gc0v12s-rasyas-projects-c1fc3a82.vercel.app [35s]
+Completing...
+Aliased: https://dashboard-ppdb.vercel.app [35s]
+
+Common next commands:
+- `vercel inspect dashboard-ppdb-e0gc0v12s-rasyas-projects-c1fc3a82.vercel.app --logs`
+- `vercel redeploy dashboard-ppdb-e0gc0v12s-rasyas-projects-c1fc3a82.vercel.app`
+> Tip: Run `npx plugins add vercel/vercel-plugin` to enhance your agent experience
